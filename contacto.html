@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Contacto | Tu Espacio Hacker</title>
+<link rel="stylesheet" href="assets/style.css"/>
+<style>
+.contact-layout {
+  display:grid; grid-template-columns:1fr 1.8fr; gap:3rem; align-items:start;
+}
+@media(max-width:860px){ .contact-layout{ grid-template-columns:1fr; } }
+
+.info-block { margin-bottom:2rem; }
+.info-item {
+  display:flex; align-items:flex-start; gap:1rem; margin-bottom:1.6rem;
+}
+.info-ico {
+  width:48px; height:48px; border-radius:8px;
+  background:var(--green-dim); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.3rem; flex-shrink:0;
+}
+.info-item strong {
+  display:block; font-family:var(--ui); font-size:.78rem;
+  font-weight:700; text-transform:uppercase; letter-spacing:1px;
+  color:var(--text); margin-bottom:.2rem;
+}
+.info-item a, .info-item span { font-size:.9rem; color:var(--text2); }
+.info-item a:hover { color:var(--green); }
+
+.form-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:14px; padding:2.2rem;
+}
+.form-card h3 {
+  font-family:var(--display); font-size:1.6rem; letter-spacing:2px;
+  margin-bottom:1.8rem;
+}
+
+.faq-list { margin-top:3rem; }
+.faq-item {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:1.4rem; margin-bottom:.9rem;
+  cursor:pointer; transition:.2s;
+}
+.faq-item:hover { border-color:var(--border2); }
+.faq-q {
+  font-family:var(--ui); font-weight:700; font-size:.95rem;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.faq-q span { color:var(--green); transition:.2s; }
+.faq-a { font-size:.875rem; color:var(--text2); margin-top:.8rem; display:none; line-height:1.7; }
+.faq-item.open .faq-a { display:block; }
+.faq-item.open .faq-q span { transform:rotate(45deg); display:inline-block; }
+</style>
+</head>
+<body>
+<script src="assets/nav-footer.js"></script>
+
+<div class="page-hero">
+  <span class="page-hero-tag">// contacto</span>
+  <h1><span class="chrome">HABLEMOS</span><br><span class="chrome-green">HOY</span></h1>
+  <p>¿Tienes un proyecto, consulta o quieres saber más? Estamos aquí para ayudarte.</p>
+</div>
+
+<section class="section alt">
+  <div class="container">
+    <div class="contact-layout">
+
+      <!-- INFO -->
+      <div>
+        <div class="sec-header fade-up" style="margin-bottom:2rem">
+          <span class="sec-tag">// información</span>
+          <h2><span class="chrome">Datos de</span> <span class="chrome-green">Contacto</span></h2>
+        </div>
+        <div class="info-block fade-up">
+          <div class="info-item">
+            <div class="info-ico">📧</div>
+            <div>
+              <strong>Email Principal</strong>
+              <a href="mailto:tuespacioforense@gmail.com">tuespacioforense@gmail.com</a>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-ico">🕐</div>
+            <div>
+              <strong>Horario de Atención</strong>
+              <span>Lun – Vie: 9:00 – 18:00 CST</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-ico">⚡</div>
+            <div>
+              <strong>Tiempo de Respuesta</strong>
+              <span>Menos de 24 horas hábiles</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-ico">📍</div>
+            <div>
+              <strong>Ubicación</strong>
+              <span>México — Servicio Nacional &amp; Remoto</span>
+            </div>
+          </div>
+        </div>
+
+        <a href="mailto:tuespacioforense@gmail.com" class="btn btn-primary fade-up" style="display:inline-block">📧 Escribir Email Directo</a>
+
+        <!-- FAQ -->
+        <div class="faq-list fade-up" style="margin-top:2.5rem">
+          <div class="sec-header" style="margin-bottom:1.5rem">
+            <span class="sec-tag">// preguntas frecuentes</span>
+            <h2 style="font-size:1.8rem"><span class="chrome">FAQ</span></h2>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">¿Los servicios son legales? <span>+</span></div>
+            <div class="faq-a">Sí. Todos nuestros servicios se realizan con autorización escrita previa del propietario del sistema. Operamos bajo el Código Penal Federal de México y las mejores prácticas internacionales de ethical hacking.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">¿Qué pasa después de contactarles? <span>+</span></div>
+            <div class="faq-a">Te respondemos en menos de 24h. Agendamos una llamada inicial gratuita para entender tu necesidad, y enviamos una propuesta con alcance y precio en 48h.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">¿Manejan información confidencial? <span>+</span></div>
+            <div class="faq-a">Absolutamente. Firmamos un acuerdo de confidencialidad (NDA) antes de iniciar cualquier proyecto. Toda la información es tratada con el máximo nivel de discreción.</div>
+          </div>
+          <div class="faq-item">
+            <div class="faq-q">¿Trabajan con empresas pequeñas? <span>+</span></div>
+            <div class="faq-a">Sí. Tenemos servicios adaptados a todos los tamaños. Desde auditorías básicas para PyMEs hasta proyectos enterprise de largo plazo. Consultanos y buscamos la mejor opción para tu presupuesto.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORM -->
+      <div class="form-card fade-up">
+        <h3><span class="chrome">Envía un</span> <span class="chrome-green">Mensaje</span></h3>
+        <form onsubmit="submitForm(event)">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div class="form-group">
+              <label>Nombre</label>
+              <input type="text" placeholder="Tu nombre" required/>
+            </div>
+            <div class="form-group">
+              <label>Apellido</label>
+              <input type="text" placeholder="Tu apellido"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" placeholder="tu@empresa.com" required/>
+          </div>
+          <div class="form-group">
+            <label>Empresa (opcional)</label>
+            <input type="text" placeholder="Nombre de tu empresa"/>
+          </div>
+          <div class="form-group">
+            <label>Servicio de Interés</label>
+            <select>
+              <option value="">Selecciona un servicio</option>
+              <option>Auditoría de Seguridad</option>
+              <option>Análisis Forense Digital</option>
+              <option>Pentesting Web & Redes</option>
+              <option>Capacitación & Cursos</option>
+              <option>Consultoría de Seguridad</option>
+              <option>OSINT & Inteligencia</option>
+              <option>Herramientas / Catálogo</option>
+              <option>PDFs Premium</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Presupuesto aproximado (opcional)</label>
+            <select>
+              <option value="">Sin especificar</option>
+              <option>Menos de $5,000 MXN</option>
+              <option>$5,000 – $15,000 MXN</option>
+              <option>$15,000 – $50,000 MXN</option>
+              <option>Más de $50,000 MXN</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Mensaje</label>
+            <textarea placeholder="Cuéntanos sobre tu proyecto, necesidad o consulta..." rows="5" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;border:none;cursor:pointer;font-size:.85rem">
+            Enviar Mensaje →
+          </button>
+          <p style="font-size:.75rem;color:var(--text3);text-align:center;margin-top:.8rem">
+            Tu información es confidencial. Respondemos en menos de 24h hábiles.
+          </p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script src="assets/shared.js"></script>
+<script>
+function submitForm(e) {
+  e.preventDefault();
+  showToast('✅ Mensaje enviado. Te contactaremos pronto.');
+  e.target.reset();
+}
+document.querySelectorAll('.faq-item').forEach(item => {
+  item.addEventListener('click', () => item.classList.toggle('open'));
+});
+</script>
+</body>
+</html>

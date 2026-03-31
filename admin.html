@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin | Tu Espacio Hacker</title>
+<link rel="stylesheet" href="assets/style.css"/>
+<style>
+body { background:var(--bg); }
+
+/* LOGIN */
+#loginScreen {
+  min-height:100vh; display:flex;
+  align-items:center; justify-content:center;
+  background:radial-gradient(ellipse 70% 50% at 50% 40%, rgba(0,255,163,.05) 0%, transparent 60%);
+}
+.login-box {
+  background:var(--surface); border:1px solid var(--border2);
+  border-radius:14px; padding:3rem 2.5rem;
+  width:100%; max-width:420px; text-align:center;
+  box-shadow:0 0 70px rgba(0,255,163,.08);
+}
+.login-logo { font-family:var(--display); font-size:1.6rem; letter-spacing:3px; margin-bottom:.3rem; }
+.login-sub { font-family:var(--mono); font-size:.7rem; color:var(--text3); letter-spacing:2px; margin-bottom:2.5rem; }
+.login-icon { font-size:3rem; display:block; margin-bottom:1.5rem; }
+.login-error { color:var(--red); font-family:var(--mono); font-size:.8rem; margin-top:.8rem; display:none; }
+.login-attempts { color:var(--text3); font-family:var(--mono); font-size:.72rem; margin-top:.5rem; }
+.locked-msg {
+  color:var(--red); font-family:var(--mono); font-size:.82rem;
+  padding:.9rem; background:rgba(255,45,85,.07);
+  border:1px solid rgba(255,45,85,.2); border-radius:var(--r);
+  margin-top:.8rem; display:none;
+}
+
+/* ADMIN LAYOUT */
+#adminPanel { display:none; }
+.admin-nav {
+  background:var(--bg1); border-bottom:1px solid var(--border);
+  padding:0 2rem; height:62px;
+  display:flex; align-items:center; justify-content:space-between;
+  position:sticky; top:0; z-index:100;
+}
+.admin-logo { font-family:var(--display); font-size:1.3rem; letter-spacing:2px; }
+.admin-user { display:flex; align-items:center; gap:1rem; font-family:var(--mono); font-size:.78rem; color:var(--text2); }
+.btn-logout {
+  background:rgba(255,45,85,.1); border:1px solid rgba(255,45,85,.3);
+  color:var(--red); padding:.4rem 1rem; border-radius:var(--r);
+  font-family:var(--ui); font-weight:700; font-size:.78rem;
+  cursor:pointer; transition:.2s; text-transform:uppercase; letter-spacing:.5px;
+}
+.btn-logout:hover { background:rgba(255,45,85,.2); }
+
+.admin-layout { display:flex; min-height:calc(100vh - 62px); }
+.sidebar {
+  width:230px; flex-shrink:0;
+  background:var(--bg1); border-right:1px solid var(--border);
+  padding:1.5rem 0;
+}
+.sb-section {
+  font-family:var(--mono); font-size:.65rem; color:var(--text3);
+  letter-spacing:2px; padding:.5rem 1.5rem; margin-bottom:.25rem;
+}
+.sb-link {
+  display:flex; align-items:center; gap:.75rem;
+  padding:.7rem 1.5rem; color:var(--text2);
+  font-family:var(--ui); font-weight:600; font-size:.88rem;
+  cursor:pointer; transition:.2s; text-transform:uppercase;
+  letter-spacing:.5px; border-left:3px solid transparent;
+}
+.sb-link:hover, .sb-link.on {
+  color:var(--green); background:var(--green-dim);
+  border-left-color:var(--green);
+}
+
+.admin-main { flex:1; padding:2rem; overflow-y:auto; }
+.a-page { display:none; }
+.a-page.on { display:block; }
+.page-title { font-family:var(--display); font-size:1.8rem; letter-spacing:2px; margin-bottom:.3rem; }
+.page-desc { color:var(--text2); font-size:.88rem; margin-bottom:2rem; }
+
+/* Stats */
+.stats-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1.1rem; margin-bottom:2rem; }
+.stat-box {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:1.4rem;
+}
+.stat-box-n { font-family:var(--display); font-size:2.2rem; letter-spacing:1px; color:var(--green); display:block; line-height:1; }
+.stat-box-l { font-family:var(--mono); font-size:.65rem; color:var(--text3); letter-spacing:2px; text-transform:uppercase; }
+
+/* Tables */
+.table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; margin-bottom:1.5rem; }
+.table-head {
+  padding:.9rem 1.5rem; border-bottom:1px solid var(--border);
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.8rem;
+}
+.table-head h3 { font-family:var(--ui); font-size:.9rem; font-weight:700; text-transform:uppercase; letter-spacing:1px; }
+table { width:100%; border-collapse:collapse; }
+th {
+  background:var(--bg2); padding:.7rem 1rem; text-align:left;
+  font-family:var(--ui); font-size:.72rem; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; color:var(--text2);
+  border-bottom:1px solid var(--border);
+}
+td {
+  padding:.8rem 1rem; border-bottom:1px solid rgba(255,255,255,.03);
+  font-size:.85rem; color:var(--text2);
+}
+tr:last-child td { border-bottom:none; }
+tr:hover td { background:rgba(0,255,163,.02); }
+
+.tg { display:inline-block; font-size:.62rem; font-weight:700; padding:.15rem .6rem; border-radius:100px; text-transform:uppercase; letter-spacing:.5px; }
+.tg-green { background:rgba(0,255,163,.1); color:var(--green); border:1px solid rgba(0,255,163,.25); }
+.tg-cyan  { background:rgba(0,212,255,.1); color:var(--cyan);  border:1px solid rgba(0,212,255,.25); }
+.tg-gold  { background:rgba(255,196,66,.1); color:var(--gold); border:1px solid rgba(255,196,66,.25); }
+.tg-red   { background:rgba(255,45,85,.1);  color:var(--red);  border:1px solid rgba(255,45,85,.25);  }
+
+.btn-add {
+  background:var(--green); color:var(--bg);
+  padding:.5rem 1.2rem; border:none; border-radius:var(--r);
+  font-family:var(--ui); font-weight:700; font-size:.78rem;
+  text-transform:uppercase; letter-spacing:.5px; cursor:pointer; transition:.2s;
+}
+.btn-add:hover { background:var(--green2); }
+.btn-ed {
+  background:none; border:1px solid var(--border); color:var(--text2);
+  padding:.28rem .7rem; border-radius:var(--r);
+  font-size:.72rem; cursor:pointer; transition:.2s; font-family:var(--ui); font-weight:600;
+}
+.btn-ed:hover { border-color:var(--green); color:var(--green); }
+.btn-rm {
+  background:none; border:1px solid rgba(255,45,85,.3); color:var(--red);
+  padding:.28rem .7rem; border-radius:var(--r);
+  font-size:.72rem; cursor:pointer; transition:.2s; font-family:var(--ui); font-weight:600; margin-left:.3rem;
+}
+.btn-rm:hover { background:rgba(255,45,85,.1); }
+
+/* Modal */
+.a-modal-bg {
+  position:fixed; inset:0; background:rgba(0,0,0,.85); backdrop-filter:blur(8px);
+  z-index:2000; display:none; align-items:center; justify-content:center; padding:1.5rem;
+}
+.a-modal-bg.open { display:flex; }
+.a-modal {
+  background:var(--bg2); border:1px solid var(--border2);
+  border-radius:12px; padding:2rem; width:100%; max-width:500px;
+  position:relative; max-height:90vh; overflow-y:auto;
+  box-shadow:0 0 70px rgba(0,255,163,.1);
+}
+.a-modal h2 { font-family:var(--display); font-size:1.5rem; letter-spacing:2px; margin-bottom:1.5rem; }
+.a-modal-close {
+  position:absolute; top:1rem; right:1rem;
+  background:none; border:none; color:var(--text2); cursor:pointer; font-size:1rem;
+}
+.a-modal-close:hover { color:var(--red); }
+.a-modal .form-group input,
+.a-modal .form-group select,
+.a-modal .form-group textarea {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:var(--r); color:var(--text);
+  padding:.7rem 1rem; font-family:var(--body); font-size:.875rem;
+  width:100%; outline:none; transition:.2s;
+}
+.a-modal .form-group select option { background:var(--bg3); }
+.a-modal .form-group input:focus,
+.a-modal .form-group select:focus,
+.a-modal .form-group textarea:focus { border-color:var(--border2); }
+.modal-actions { display:flex; gap:.75rem; justify-content:flex-end; margin-top:1.5rem; }
+.btn-cancel {
+  background:var(--surface); border:1px solid var(--border); color:var(--text2);
+  padding:.55rem 1.2rem; border-radius:var(--r);
+  font-family:var(--ui); font-weight:600; font-size:.82rem; cursor:pointer;
+}
+
+/* Security card */
+.sec-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:2rem; max-width:480px; }
+.sec-card h3 { font-family:var(--display); font-size:1.3rem; letter-spacing:1px; margin-bottom:1.2rem; }
+.sec-note {
+  background:rgba(0,212,255,.05); border:1px solid rgba(0,212,255,.2);
+  border-radius:var(--r); padding:.9rem; margin-bottom:1.4rem;
+  font-size:.82rem; color:var(--text2); line-height:1.6;
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <span class="login-icon">🔐</span>
+    <div class="login-logo"><span class="chrome">TU ESPACIO</span> <span class="chrome-green">HACKER</span></div>
+    <div class="login-sub">// PANEL DE ADMINISTRACIÓN — ACCESO RESTRINGIDO</div>
+    <div id="loginForm">
+      <div class="form-group"><label>Usuario</label><input type="text" id="lu" placeholder="admin" autocomplete="username"/></div>
+      <div class="form-group"><label>Contraseña</label><input type="password" id="lp" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="btn btn-primary" style="width:100%;border:none;cursor:pointer" onclick="doLogin()">Iniciar Sesión →</button>
+      <div class="login-error" id="lerr">⚠ Credenciales incorrectas</div>
+      <div class="login-attempts" id="lattempts"></div>
+      <div class="locked-msg" id="locked">🔒 Demasiados intentos. Espera <span id="ltimer">60</span>s.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+  <div class="admin-nav">
+    <div class="admin-logo"><span class="chrome">TU ESPACIO</span> <span class="chrome-green">HACKER</span> <span style="font-size:.8rem;color:var(--text3);margin-left:.5rem">// ADMIN</span></div>
+    <div class="admin-user">
+      <span>● admin</span>
+      <button class="btn-logout" onclick="doLogout()">Cerrar Sesión</button>
+    </div>
+  </div>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sb-section">PANEL</div>
+      <div class="sb-link on" onclick="showPage('dashboard',this)">📊 Dashboard</div>
+      <div class="sb-section">CATÁLOGO</div>
+      <div class="sb-link" onclick="showPage('productos',this)">🛠️ Herramientas</div>
+      <div class="sb-link" onclick="showPage('pdfs',this)">📄 PDFs</div>
+      <div class="sb-section">CONTENIDO</div>
+      <div class="sb-link" onclick="showPage('blog',this)">📝 Blog</div>
+      <div class="sb-link" onclick="showPage('servicios',this)">⚙️ Servicios</div>
+      <div class="sb-section">CONFIG</div>
+      <div class="sb-link" onclick="showPage('seguridad',this)">🔒 Seguridad</div>
+      <div class="sb-link" onclick="window.open('index.html','_blank')">🌐 Ver Sitio ↗</div>
+    </aside>
+    <main class="admin-main">
+
+      <!-- DASHBOARD -->
+      <div class="a-page on" id="page-dashboard">
+        <div class="page-title"><span class="chrome">DASH</span><span class="chrome-green">BOARD</span></div>
+        <div class="page-desc">Resumen general del sitio</div>
+        <div class="stats-row">
+          <div class="stat-box"><span class="stat-box-n" id="sProducts">0</span><span class="stat-box-l">Productos</span></div>
+          <div class="stat-box"><span class="stat-box-n" id="sPdfs">0</span><span class="stat-box-l">PDFs</span></div>
+          <div class="stat-box"><span class="stat-box-n" id="sBlogs">0</span><span class="stat-box-l">Blogs</span></div>
+          <div class="stat-box"><span class="stat-box-n" id="sServices">0</span><span class="stat-box-l">Servicios</span></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-head"><h3>Actividad Reciente</h3></div>
+          <table><thead><tr><th>Evento</th><th>Detalle</th><th>Fecha</th></tr></thead>
+          <tbody id="actLog"></tbody></table>
+        </div>
+      </div>
+
+      <!-- PRODUCTOS -->
+      <div class="a-page" id="page-productos">
+        <div class="page-title"><span class="chrome">HERRAMIENTAS</span></div>
+        <div class="page-desc">Gestiona el catálogo de herramientas</div>
+        <div class="table-wrap">
+          <div class="table-head">
+            <h3>Productos (<span id="pCount">0</span>)</h3>
+            <button class="btn-add" onclick="oModal('product')">+ Agregar</button>
+          </div>
+          <table><thead><tr><th>Ico</th><th>Nombre</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead>
+          <tbody id="prodTable"></tbody></table>
+        </div>
+      </div>
+
+      <!-- PDFs -->
+      <div class="a-page" id="page-pdfs">
+        <div class="page-title"><span class="chrome-green">PDFs</span></div>
+        <div class="page-desc">Gestiona los recursos PDF</div>
+        <div class="table-wrap">
+          <div class="table-head">
+            <h3>PDFs (<span id="pdfCount">0</span>)</h3>
+            <button class="btn-add" onclick="oModal('pdf')">+ Agregar</button>
+          </div>
+          <table><thead><tr><th>Ico</th><th>Nombre</th><th>Tipo</th><th>Precio</th><th>Acciones</th></tr></thead>
+          <tbody id="pdfTable"></tbody></table>
+        </div>
+      </div>
+
+      <!-- BLOG -->
+      <div class="a-page" id="page-blog">
+        <div class="page-title"><span class="chrome">BLOG</span></div>
+        <div class="page-desc">Gestiona las publicaciones</div>
+        <div class="table-wrap">
+          <div class="table-head">
+            <h3>Posts (<span id="bCount">0</span>)</h3>
+            <button class="btn-add" onclick="oModal('blog')">+ Nuevo Post</button>
+          </div>
+          <table><thead><tr><th>Título</th><th>Categoría</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="blogTable"></tbody></table>
+        </div>
+      </div>
+
+      <!-- SERVICIOS -->
+      <div class="a-page" id="page-servicios">
+        <div class="page-title"><span class="chrome-green">SERVICIOS</span></div>
+        <div class="page-desc">Gestiona los servicios del sitio</div>
+        <div class="table-wrap">
+          <div class="table-head">
+            <h3>Servicios (<span id="sCount">0</span>)</h3>
+            <button class="btn-add" onclick="oModal('service')">+ Agregar</button>
+          </div>
+          <table><thead><tr><th>Ico</th><th>Nombre</th><th>Precio desde</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="srvTable"></tbody></table>
+        </div>
+      </div>
+
+      <!-- SEGURIDAD -->
+      <div class="a-page" id="page-seguridad">
+        <div class="page-title"><span class="chrome">SEGU</span><span class="chrome-green">RIDAD</span></div>
+        <div class="page-desc">Configuración de acceso y contraseña</div>
+        <div class="sec-card">
+          <h3>Cambiar Contraseña</h3>
+          <div class="sec-note">⚠️ Usa mínimo 10 caracteres con mayúsculas, números y símbolos. La contraseña se almacena localmente en el navegador.</div>
+          <div class="form-group"><label>Contraseña Actual</label><input type="password" id="pwCur" placeholder="••••••••"/></div>
+          <div class="form-group"><label>Nueva Contraseña</label><input type="password" id="pwNew" placeholder="Mínimo 10 caracteres"/></div>
+          <div class="form-group"><label>Confirmar Nueva Contraseña</label><input type="password" id="pwCfm" placeholder="Repite la contraseña"/></div>
+          <button class="btn-add" onclick="changePw()">Actualizar Contraseña</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="a-modal-bg" id="mProduct">
+  <div class="a-modal">
+    <button class="a-modal-close" onclick="cModal('mProduct')">✕</button>
+    <h2>🛠️ <span id="mProdTitle">Agregar Producto</span></h2>
+    <input type="hidden" id="piIdx" value="-1"/>
+    <div class="form-group"><label>Icono (emoji)</label><input type="text" id="piIco" placeholder="💻"/></div>
+    <div class="form-group"><label>Nombre</label><input type="text" id="piName"/></div>
+    <div class="form-group"><label>Descripción</label><textarea id="piDesc" rows="3"></textarea></div>
+    <div class="form-group"><label>Precio</label><input type="text" id="piPrice" placeholder="$1,200 MXN"/></div>
+    <div class="form-group"><label>Stock</label><input type="text" id="piStock" placeholder="En stock"/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cModal('mProduct')">Cancelar</button>
+      <button class="btn-add" onclick="saveProd()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="a-modal-bg" id="mPdf">
+  <div class="a-modal">
+    <button class="a-modal-close" onclick="cModal('mPdf')">✕</button>
+    <h2>📄 <span id="mPdfTitle">Agregar PDF</span></h2>
+    <input type="hidden" id="pdfIdx" value="-1"/>
+    <div class="form-group"><label>Icono (emoji)</label><input type="text" id="pdfIco" placeholder="📘"/></div>
+    <div class="form-group"><label>Nombre</label><input type="text" id="pdfName"/></div>
+    <div class="form-group"><label>Descripción</label><textarea id="pdfDesc" rows="3"></textarea></div>
+    <div class="form-group"><label>Tipo</label>
+      <select id="pdfType"><option value="free">✅ Gratis</option><option value="paid">🔒 Premium</option></select>
+    </div>
+    <div class="form-group"><label>Precio (si es de pago)</label><input type="text" id="pdfPrice" placeholder="$299 MXN"/></div>
+    <div class="form-group"><label>URL de descarga</label><input type="text" id="pdfUrl" placeholder="https://..."/></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cModal('mPdf')">Cancelar</button>
+      <button class="btn-add" onclick="savePdf()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="a-modal-bg" id="mBlog">
+  <div class="a-modal">
+    <button class="a-modal-close" onclick="cModal('mBlog')">✕</button>
+    <h2>📝 <span id="mBlogTitle">Nuevo Post</span></h2>
+    <input type="hidden" id="blogIdx" value="-1"/>
+    <div class="form-group"><label>Título</label><input type="text" id="bTitle"/></div>
+    <div class="form-group"><label>Categoría</label>
+      <select id="bCat">
+        <option>pentesting</option><option>defensa</option><option>osint</option>
+        <option>forense</option><option>herramientas</option><option>noticias</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Resumen</label><textarea id="bSummary" rows="4"></textarea></div>
+    <div class="form-group"><label>Estado</label>
+      <select id="bStatus"><option value="publicado">Publicado</option><option value="borrador">Borrador</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cModal('mBlog')">Cancelar</button>
+      <button class="btn-add" onclick="saveBlog()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="a-modal-bg" id="mService">
+  <div class="a-modal">
+    <button class="a-modal-close" onclick="cModal('mService')">✕</button>
+    <h2>⚙️ <span id="mSrvTitle">Agregar Servicio</span></h2>
+    <input type="hidden" id="srvIdx" value="-1"/>
+    <div class="form-group"><label>Icono (emoji)</label><input type="text" id="sIco" placeholder="🔐"/></div>
+    <div class="form-group"><label>Nombre</label><input type="text" id="sName"/></div>
+    <div class="form-group"><label>Descripción</label><textarea id="sDesc" rows="3"></textarea></div>
+    <div class="form-group"><label>Precio desde</label><input type="text" id="sPrice" placeholder="Desde $4,500 MXN"/></div>
+    <div class="form-group"><label>Estado</label>
+      <select id="sStatus"><option value="activo">Activo</option><option value="pausado">Pausado</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="cModal('mService')">Cancelar</button>
+      <button class="btn-add" onclick="saveSrv()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== AUTH ===== */
+const PW_KEY='teh_pw', SESS_KEY='teh_sess', ATT_KEY='teh_att';
+const MAX_ATT=5, LOCK_S=60, SESS_MS=3600000;
+const getPw=()=>localStorage.getItem(PW_KEY)||'TuEspacioHacker2025!';
+const getAtt=()=>JSON.parse(localStorage.getItem(ATT_KEY)||'{"n":0,"ts":0}');
+const setAtt=d=>localStorage.setItem(ATT_KEY,JSON.stringify(d));
+const clearAtt=()=>localStorage.removeItem(ATT_KEY);
+const isLocked=()=>{const a=getAtt();if(a.n>=MAX_ATT){const e=(Date.now()-a.ts)/1000;if(e<LOCK_S)return{locked:true,rem:Math.ceil(LOCK_S-e)};clearAtt();}return{locked:false};};
+const sessOk=()=>{const s=JSON.parse(localStorage.getItem(SESS_KEY)||'null');if(!s)return false;if(Date.now()-s.ts>SESS_MS){localStorage.removeItem(SESS_KEY);return false;}return true;};
+const newSess=()=>localStorage.setItem(SESS_KEY,JSON.stringify({ts:Date.now()}));
+const killSess=()=>localStorage.removeItem(SESS_KEY);
+
+function doLogin(){
+  const lk=isLocked();if(lk.locked){showLocked(lk.rem);return;}
+  const u=document.getElementById('lu').value.trim();
+  const p=document.getElementById('lp').value;
+  if(u==='admin'&&p===getPw()){clearAtt();newSess();log('Login exitoso','admin');showAdmin();}
+  else{
+    const a=getAtt();a.n++;a.ts=Date.now();setAtt(a);
+    document.getElementById('lerr').style.display='block';
+    const r=MAX_ATT-a.n;
+    document.getElementById('lattempts').textContent=r>0?`Intentos restantes: ${r}`:'';
+    if(a.n>=MAX_ATT)showLocked(LOCK_S);
+  }
+}
+function showLocked(s){
+  document.getElementById('lerr').style.display='none';
+  document.getElementById('locked').style.display='block';
+  const el=document.getElementById('ltimer');
+  el.textContent=s;
+  const iv=setInterval(()=>{s--;el.textContent=s;if(s<=0){clearInterval(iv);document.getElementById('locked').style.display='none';clearAtt();}},1000);
+}
+function doLogout(){killSess();document.getElementById('adminPanel').style.display='none';document.getElementById('loginScreen').style.display='flex';document.getElementById('lp').value='';}
+function showAdmin(){document.getElementById('loginScreen').style.display='none';document.getElementById('adminPanel').style.display='block';refresh();}
+if(sessOk())showAdmin();
+setInterval(()=>{if(sessOk())return;if(document.getElementById('adminPanel').style.display==='block'){alert('Sesión expirada.');doLogout();}},30000);
+
+function changePw(){
+  const c=document.getElementById('pwCur').value;
+  const n=document.getElementById('pwNew').value;
+  const cf=document.getElementById('pwCfm').value;
+  if(c!==getPw()){toast('⚠️ Contraseña actual incorrecta');return;}
+  if(n.length<10){toast('⚠️ Mínimo 10 caracteres');return;}
+  if(n!==cf){toast('⚠️ Las contraseñas no coinciden');return;}
+  localStorage.setItem(PW_KEY,n);log('Contraseña actualizada','admin');
+  toast('✅ Contraseña actualizada');
+  ['pwCur','pwNew','pwCfm'].forEach(id=>document.getElementById(id).value='');
+}
+
+/* ===== DATA ===== */
+const get=k=>JSON.parse(localStorage.getItem(k)||'[]');
+const set=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+function seed(){
+  if(!get('teh_prod').length)set('teh_prod',[
+    {ico:'💻',name:'USB Rubber Ducky',desc:'Inyección de keystroke para auditorías.',price:'$850 MXN',stock:'En stock'},
+    {ico:'📡',name:'Alfa AWUS036ACH',desc:'Adaptador WiFi monitor mode.',price:'$1,200 MXN',stock:'En stock'},
+    {ico:'📻',name:'Flipper Zero',desc:'RFID/NFC/IR/sub-GHz multitool.',price:'$3,200 MXN',stock:'Disponible'},
+  ]);
+  if(!get('teh_pdfs').length)set('teh_pdfs',[
+    {ico:'📘',name:'Guía Kali Linux',desc:'Introducción al OS de pentesting.',type:'free',price:'GRATIS',url:'#'},
+    {ico:'📕',name:'Pentesting Completo',desc:'Manual avanzado 220+ págs.',type:'paid',price:'$299 MXN',url:'#'},
+  ]);
+  if(!get('teh_blogs').length)set('teh_blogs',[
+    {title:'Primera auditoría con Nmap',cat:'pentesting',summary:'Guía para principiantes.',status:'publicado',date:'2025-03-28'},
+    {title:'5 configs de seguridad en tu router',cat:'defensa',summary:'Protege tu red.',status:'publicado',date:'2025-03-20'},
+  ]);
+  if(!get('teh_srvs').length)set('teh_srvs',[
+    {ico:'🔐',name:'Auditoría de Seguridad',desc:'Evaluación de vulnerabilidades.',price:'Desde $4,500 MXN',status:'activo'},
+    {ico:'📱',name:'Forense Digital',desc:'Recuperación y análisis de evidencia.',price:'Desde $6,000 MXN',status:'activo'},
+  ]);
+}
+seed();
+function log(ev,det){const l=get('teh_log');l.unshift({ev,det,d:new Date().toLocaleString('es-MX')});if(l.length>20)l.pop();set('teh_log',l);}
+
+/* ===== NAVIGATION ===== */
+function showPage(id,el){
+  document.querySelectorAll('.a-page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('on'));
+  document.getElementById('page-'+id).classList.add('on');
+  if(el)el.classList.add('on');
+  refresh();
+}
+
+/* ===== RENDER ===== */
+function refresh(){
+  const prods=get('teh_prod'),pdfs=get('teh_pdfs'),blogs=get('teh_blogs'),srvs=get('teh_srvs');
+  document.getElementById('sProducts').textContent=prods.length;
+  document.getElementById('sPdfs').textContent=pdfs.length;
+  document.getElementById('sBlogs').textContent=blogs.length;
+  document.getElementById('sServices').textContent=srvs.length;
+  document.getElementById('pCount').textContent=prods.length;
+  document.getElementById('pdfCount').textContent=pdfs.length;
+  document.getElementById('bCount').textContent=blogs.length;
+  document.getElementById('sCount').textContent=srvs.length;
+
+  document.getElementById('prodTable').innerHTML=prods.map((p,i)=>`<tr>
+    <td style="font-size:1.4rem">${p.ico}</td><td style="color:var(--text)">${p.name}</td>
+    <td style="color:var(--green)">${p.price}</td><td><span class="tg tg-green">${p.stock}</span></td>
+    <td><button class="btn-ed" onclick="editProd(${i})">Editar</button><button class="btn-rm" onclick="delProd(${i})">✕</button></td>
+  </tr>`).join('');
+
+  document.getElementById('pdfTable').innerHTML=pdfs.map((p,i)=>`<tr>
+    <td style="font-size:1.4rem">${p.ico}</td><td style="color:var(--text)">${p.name}</td>
+    <td><span class="tg ${p.type==='free'?'tg-green':'tg-cyan'}">${p.type==='free'?'Gratis':'Premium'}</span></td>
+    <td style="color:var(--green)">${p.price}</td>
+    <td><button class="btn-ed" onclick="editPdf(${i})">Editar</button><button class="btn-rm" onclick="delPdf(${i})">✕</button></td>
+  </tr>`).join('');
+
+  document.getElementById('blogTable').innerHTML=blogs.map((b,i)=>`<tr>
+    <td style="color:var(--text)">${b.title}</td>
+    <td><span class="tg tg-green" style="font-size:.6rem">${b.cat}</span></td>
+    <td style="font-family:var(--mono);font-size:.75rem;color:var(--text3)">${b.date}</td>
+    <td><span class="tg ${b.status==='publicado'?'tg-green':'tg-gold'}">${b.status}</span></td>
+    <td><button class="btn-ed" onclick="editBlog(${i})">Editar</button><button class="btn-rm" onclick="delBlog(${i})">✕</button></td>
+  </tr>`).join('');
+
+  document.getElementById('srvTable').innerHTML=srvs.map((s,i)=>`<tr>
+    <td style="font-size:1.4rem">${s.ico}</td><td style="color:var(--text)">${s.name}</td>
+    <td style="color:var(--green);font-size:.82rem">${s.price}</td>
+    <td><span class="tg ${s.status==='activo'?'tg-green':'tg-red'}">${s.status}</span></td>
+    <td><button class="btn-ed" onclick="editSrv(${i})">Editar</button><button class="btn-rm" onclick="delSrv(${i})">✕</button></td>
+  </tr>`).join('');
+
+  const logs=get('teh_log');
+  document.getElementById('actLog').innerHTML=logs.slice(0,8).map(l=>`<tr>
+    <td style="color:var(--green)">${l.ev}</td><td>${l.det}</td>
+    <td style="font-family:var(--mono);font-size:.72rem;color:var(--text3)">${l.d}</td>
+  </tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--text3);padding:1.5rem">Sin actividad</td></tr>';
+}
+
+/* ===== MODALS ===== */
+const oModal=id=>({product:'mProduct',pdf:'mPdf',blog:'mBlog',service:'mService'}[id]&&document.getElementById({product:'mProduct',pdf:'mPdf',blog:'mBlog',service:'mService'}[id]).classList.add('open'));
+const cModal=id=>document.getElementById(id)?.classList.remove('open');
+document.querySelectorAll('.a-modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+/* PRODUCTS */
+function saveProd(){
+  const ico=document.getElementById('piIco').value||'📦';
+  const name=document.getElementById('piName').value.trim();
+  if(!name){toast('⚠️ Nombre requerido');return;}
+  const item={ico,name,desc:document.getElementById('piDesc').value,price:document.getElementById('piPrice').value,stock:document.getElementById('piStock').value||'En stock'};
+  const data=get('teh_prod'),idx=parseInt(document.getElementById('piIdx').value);
+  if(idx>=0)data[idx]=item; else data.push(item);
+  set('teh_prod',data);log(idx>=0?'Producto editado':'Producto agregado',name);
+  cModal('mProduct');refresh();toast('✅ Producto guardado');
+  ['piIdx','piIco','piName','piDesc','piPrice','piStock'].forEach(id=>document.getElementById(id).value=id==='piIdx'?-1:'');
+}
+function editProd(i){const p=get('teh_prod')[i];document.getElementById('mProdTitle').textContent='Editar Producto';document.getElementById('piIdx').value=i;document.getElementById('piIco').value=p.ico;document.getElementById('piName').value=p.name;document.getElementById('piDesc').value=p.desc;document.getElementById('piPrice').value=p.price;document.getElementById('piStock').value=p.stock;document.getElementById('mProduct').classList.add('open');}
+function delProd(i){if(!confirm('¿Eliminar?'))return;const d=get('teh_prod');log('Producto eliminado',d[i].name);d.splice(i,1);set('teh_prod',d);refresh();toast('🗑 Eliminado');}
+
+/* PDFs */
+function savePdf(){
+  const name=document.getElementById('pdfName').value.trim();if(!name){toast('⚠️ Nombre requerido');return;}
+  const type=document.getElementById('pdfType').value;
+  const item={ico:document.getElementById('pdfIco').value||'📄',name,desc:document.getElementById('pdfDesc').value,type,price:type==='free'?'GRATIS':document.getElementById('pdfPrice').value,url:document.getElementById('pdfUrl').value||'#'};
+  const data=get('teh_pdfs'),idx=parseInt(document.getElementById('pdfIdx').value);
+  if(idx>=0)data[idx]=item;else data.push(item);
+  set('teh_pdfs',data);log(idx>=0?'PDF editado':'PDF agregado',name);
+  cModal('mPdf');refresh();toast('✅ PDF guardado');
+}
+function editPdf(i){const p=get('teh_pdfs')[i];document.getElementById('mPdfTitle').textContent='Editar PDF';document.getElementById('pdfIdx').value=i;document.getElementById('pdfIco').value=p.ico;document.getElementById('pdfName').value=p.name;document.getElementById('pdfDesc').value=p.desc;document.getElementById('pdfType').value=p.type;document.getElementById('pdfPrice').value=p.price;document.getElementById('pdfUrl').value=p.url;document.getElementById('mPdf').classList.add('open');}
+function delPdf(i){if(!confirm('¿Eliminar?'))return;const d=get('teh_pdfs');log('PDF eliminado',d[i].name);d.splice(i,1);set('teh_pdfs',d);refresh();toast('🗑 Eliminado');}
+
+/* Blog */
+function saveBlog(){
+  const title=document.getElementById('bTitle').value.trim();if(!title){toast('⚠️ Título requerido');return;}
+  const item={title,cat:document.getElementById('bCat').value,summary:document.getElementById('bSummary').value,status:document.getElementById('bStatus').value,date:new Date().toISOString().split('T')[0]};
+  const data=get('teh_blogs'),idx=parseInt(document.getElementById('blogIdx').value);
+  if(idx>=0)data[idx]=item;else data.push(item);
+  set('teh_blogs',data);log(idx>=0?'Blog editado':'Blog publicado',title);
+  cModal('mBlog');refresh();toast('✅ Post guardado');
+}
+function editBlog(i){const b=get('teh_blogs')[i];document.getElementById('mBlogTitle').textContent='Editar Post';document.getElementById('blogIdx').value=i;document.getElementById('bTitle').value=b.title;document.getElementById('bCat').value=b.cat;document.getElementById('bSummary').value=b.summary;document.getElementById('bStatus').value=b.status;document.getElementById('mBlog').classList.add('open');}
+function delBlog(i){if(!confirm('¿Eliminar?'))return;const d=get('teh_blogs');log('Blog eliminado',d[i].title);d.splice(i,1);set('teh_blogs',d);refresh();toast('🗑 Eliminado');}
+
+/* Services */
+function saveSrv(){
+  const name=document.getElementById('sName').value.trim();if(!name){toast('⚠️ Nombre requerido');return;}
+  const item={ico:document.getElementById('sIco').value||'⚙️',name,desc:document.getElementById('sDesc').value,price:document.getElementById('sPrice').value,status:document.getElementById('sStatus').value};
+  const data=get('teh_srvs'),idx=parseInt(document.getElementById('srvIdx').value);
+  if(idx>=0)data[idx]=item;else data.push(item);
+  set('teh_srvs',data);log(idx>=0?'Servicio editado':'Servicio agregado',name);
+  cModal('mService');refresh();toast('✅ Servicio guardado');
+}
+function editSrv(i){const s=get('teh_srvs')[i];document.getElementById('mSrvTitle').textContent='Editar Servicio';document.getElementById('srvIdx').value=i;document.getElementById('sIco').value=s.ico;document.getElementById('sName').value=s.name;document.getElementById('sDesc').value=s.desc;document.getElementById('sPrice').value=s.price;document.getElementById('sStatus').value=s.status;document.getElementById('mService').classList.add('open');}
+function delSrv(i){if(!confirm('¿Eliminar?'))return;const d=get('teh_srvs');log('Servicio eliminado',d[i].name);d.splice(i,1);set('teh_srvs',d);refresh();toast('🗑 Eliminado');}
+
+/* Toast */
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+</script>
+</body>
+</html>
