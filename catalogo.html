@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Catálogo | Tu Espacio Hacker</title>
+<link rel="stylesheet" href="assets/style.css"/>
+<style>
+.cat-tabs { display:flex; gap:.75rem; margin-bottom:2.5rem; flex-wrap:wrap; }
+.tab-btn {
+  background:var(--surface); border:1px solid var(--border);
+  color:var(--text2); padding:.65rem 1.5rem;
+  border-radius:var(--r); font-family:var(--ui);
+  font-weight:700; font-size:.78rem; letter-spacing:1.5px;
+  text-transform:uppercase; cursor:pointer; transition:.2s;
+}
+.tab-btn.on, .tab-btn:hover { background:var(--red-dim); border-color:var(--border2); color:var(--red); }
+.tab-pane { display:none; }
+.tab-pane.on { display:block; }
+
+.prod-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:10px; padding:1.6rem; transition:.3s;
+  display:flex; flex-direction:column; position:relative; overflow:hidden;
+}
+.prod-card::before {
+  content:''; position:absolute; top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);
+  transform:scaleX(0); transition:.3s;
+}
+.prod-card:hover { border-color:var(--border2); transform:translateY(-4px); box-shadow:0 14px 40px rgba(224,32,32,.07); background:var(--surface2); }
+.prod-card:hover::before { transform:scaleX(1); }
+.prod-ico { font-size:3rem; text-align:center; margin-bottom:1rem; display:block; }
+.prod-card h4 { font-family:var(--display); font-size:1.2rem; letter-spacing:1px; margin-bottom:.4rem; }
+.prod-card p { font-size:.84rem; color:var(--text2); flex:1; margin-bottom:1rem; line-height:1.6; }
+.prod-price { font-family:var(--display); font-size:1.3rem; color:var(--red); margin-bottom:1rem; }
+.prod-stock { font-family:var(--mono); font-size:.7rem; color:var(--text3); margin-bottom:.75rem; }
+
+.pdf-filters { display:flex; gap:.65rem; margin-bottom:2rem; flex-wrap:wrap; }
+.f-btn {
+  background:var(--surface); border:1px solid var(--border);
+  color:var(--text2); padding:.45rem 1.1rem; border-radius:100px;
+  font-family:var(--ui); font-size:.72rem; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase; cursor:pointer; transition:.2s;
+}
+.f-btn.on,.f-btn:hover { background:var(--red-dim); border-color:var(--border2); color:var(--red); }
+</style>
+</head>
+<body>
+<script src="assets/nav-footer.js"></script>
+
+<div class="page-hero">
+  <span class="page-hero-tag">// catálogo</span>
+  <h1><span class="chrome">NUESTRO</span><br><span class="chrome-red">CATÁLOGO</span></h1>
+  <p>Herramientas profesionales de ciberseguridad y recursos digitales</p>
+</div>
+
+<section class="section alt">
+  <div class="container">
+
+    <div class="cat-tabs">
+      <button class="tab-btn on" data-tab="tools">🛠️ Herramientas Hacker</button>
+      <button class="tab-btn" data-tab="pdfs">📄 PDFs & Recursos</button>
+    </div>
+
+    <!-- HERRAMIENTAS -->
+    <div class="tab-pane on" id="tab-tools">
+      <div class="sec-header fade-up" style="margin-bottom:2rem">
+        <span class="sec-tag">// hardware & software</span>
+        <h2><span class="chrome">Herramientas</span> <span class="chrome-red">Profesionales</span></h2>
+        <p>Equipo especializado para auditorías, pentesting y ciberseguridad ofensiva. Uso exclusivo con autorización.</p>
+      </div>
+      <div class="grid-4" id="toolsGrid"></div>
+    </div>
+
+    <!-- PDFs -->
+    <div class="tab-pane" id="tab-pdfs">
+      <div class="sec-header fade-up" style="margin-bottom:1.5rem">
+        <span class="sec-tag">// biblioteca digital</span>
+        <h2><span class="chrome">PDFs &</span> <span class="chrome-red">Recursos</span></h2>
+      </div>
+      <div class="pdf-filters">
+        <button class="f-btn on" data-f="all">Todos</button>
+        <button class="f-btn" data-f="free">✅ Gratis</button>
+        <button class="f-btn" data-f="paid">🔒 Premium</button>
+      </div>
+      <div class="grid-4" id="pdfGrid"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MODAL PAGO -->
+<div class="modal-bg" id="payModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('payModal')">✕</button>
+    <h2>🔒 <span class="chrome-red">Recurso Premium</span></h2>
+    <p id="payDesc"></p>
+    <a id="payLink" href="#" class="btn btn-primary" style="display:block;text-align:center">📧 Solicitar por Email</a>
+    <p style="font-size:.78rem;color:var(--text3);text-align:center;margin-top:1rem">Te enviaremos instrucciones de pago y el enlace de descarga.</p>
+  </div>
+</div>
+
+<script src=""></script>
+<script>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('on'));
+    document.querySelectorAll('.tab-pane').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('tab-' + b.dataset.tab).classList.add('on');
+    setTimeout(() => document.querySelectorAll('.fade-up').forEach(el => {
+      if(!el.classList.contains('visible')) fadeObserver?.observe(el);
+    }), 50);
+  });
+});
+
+// Filter
+document.querySelectorAll('.f-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('.f-btn').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    const f = b.dataset.f;
+    document.querySelectorAll('#pdfGrid .prod-card').forEach(c => {
+      c.style.display = (f === 'all' || c.dataset.type === f) ? '' : 'none';
+    });
+  });
+});
+
+// Tools data
+const tools = [
+  { ico:'💻', name:'USB Rubber Ducky', desc:'Dispositivo de inyección de keystroke para pruebas de seguridad física y auditorías de escritorio.', price:'$850 MXN', stock:'En stock' },
+  { ico:'📡', name:'Alfa AWUS036ACH', desc:'Adaptador WiFi de alta potencia con soporte monitor mode y packet injection para auditorías.', price:'$1,200 MXN', stock:'En stock' },
+  { ico:'🔌', name:'LAN Turtle', desc:'Módulo de auditoría de red con acceso remoto encubierto para pentesting de infraestructura.', price:'$950 MXN', stock:'En stock' },
+  { ico:'🐍', name:'Bash Bunny', desc:'Plataforma de ataque multi-vector para pentesting físico. Compatible con cientos de payloads.', price:'$1,500 MXN', stock:'En stock' },
+  { ico:'📻', name:'Flipper Zero', desc:'Herramienta multifuncional para análisis de RFID, NFC, IR, sub-GHz y USB HID.', price:'$3,200 MXN', stock:'Disponible' },
+  { ico:'🧲', name:'OMG Cable', desc:'Cable USB con implante WiFi para interceptar y enviar payloads de forma inalámbrica.', price:'$1,800 MXN', stock:'Pocas unidades' },
+  { ico:'📲', name:'WiFi Pineapple', desc:'Plataforma de auditoría WiFi avanzada para ataques man-in-the-middle y rogue AP.', price:'$4,200 MXN', stock:'Bajo pedido' },
+  { ico:'💾', name:'Proxmark3', desc:'Dispositivo profesional para análisis y clonación de tarjetas RFID/NFC en auditorías.', price:'$2,800 MXN', stock:'En stock' },
+  { ico:'🖥️', name:'Kali Linux USB Booteable', desc:'USB de 64GB con Kali Linux preconfigurado, herramientas instaladas y persistencia habilitada.', price:'$550 MXN', stock:'En stock' },
+  { ico:'🔋', name:'Pi Zero WiFi Implant', desc:'Raspberry Pi Zero W configurada como implante de red discreta para auditorías físicas.', price:'$680 MXN', stock:'En stock' },
+  { ico:'📦', name:'Kit Pentesting Básico', desc:'Combo: Alfa AWUS036ACH + USB Rubber Ducky + Guía PDF de uso. Ideal para comenzar.', price:'$1,850 MXN', stock:'Kit disponible', tag:'hot' },
+  { ico:'🧰', name:'Kit Pentesting Profesional', desc:'Combo completo: Flipper Zero + Bash Bunny + LAN Turtle + 3 PDFs Premium incluidos.', price:'$5,200 MXN', stock:'Kit disponible', tag:'hot' },
+];
+
+const tg = document.getElementById('toolsGrid');
+tools.forEach(t => {
+  tg.innerHTML += `<div class="prod-card fade-up">
+    ${t.tag ? `<span class="card-badge">${t.tag === 'hot' ? '🔥 Popular' : t.tag}</span>` : ''}
+    <span class="prod-ico">${t.ico}</span>
+    <span class="tag ${t.tag === 'hot' ? 'tag-hot' : 'tag-free'}">Disponible</span>
+    <h4>${t.name}</h4>
+    <p>${t.desc}</p>
+    <div class="prod-stock">📦 ${t.stock}</div>
+    <div class="prod-price">${t.price}</div>
+    <a href="mailto:tuespacioforense@gmail.com?subject=Consulta: ${encodeURIComponent(t.name)}" class="btn btn-outline" style="text-align:center">Solicitar →</a>
+  </div>`;
+});
+
+// PDFs data
+const pdfs = [
+  { ico:'📘', name:'Guía Kali Linux Principiantes', desc:'Introducción completa al OS de pentesting más usado.', price:'GRATIS', type:'free', pages:'45' },
+  { ico:'📗', name:'OWASP Top 10 Explicado', desc:'Las 10 vulnerabilidades críticas en apps web con ejemplos.', price:'GRATIS', type:'free', pages:'32' },
+  { ico:'📙', name:'Introducción a OSINT', desc:'Técnicas básicas de inteligencia de fuentes abiertas.', price:'GRATIS', type:'free', pages:'28' },
+  { ico:'📓', name:'Comandos Esenciales de Linux', desc:'Referencia rápida de 200+ comandos para hacking.', price:'GRATIS', type:'free', pages:'20' },
+  { ico:'📕', name:'Pentesting Completo', desc:'Manual avanzado con laboratorios y metodologías profesionales.', price:'$299 MXN', type:'paid', pages:'220' },
+  { ico:'📔', name:'Forense Digital Avanzado', desc:'Guía profesional con herramientas y casos prácticos reales.', price:'$349 MXN', type:'paid', pages:'180' },
+  { ico:'📒', name:'WiFi: Seguridad & Auditoría', desc:'Auditoría de redes inalámbricas en entornos autorizados.', price:'$199 MXN', type:'paid', pages:'95' },
+  { ico:'📖', name:'Python para Hackers', desc:'Programación de herramientas de hacking con Python 3.', price:'$249 MXN', type:'paid', pages:'160' },
+  { ico:'📑', name:'Active Directory Pentesting', desc:'Ataques y defensas en entornos Windows corporativos.', price:'$349 MXN', type:'paid', pages:'140' },
+];
+
+const pg = document.getElementById('pdfGrid');
+pdfs.forEach(p => {
+  const isFree = p.type === 'free';
+  pg.innerHTML += `<div class="prod-card fade-up" data-type="${p.type}">
+    <span class="prod-ico">${p.ico}</span>
+    <span class="tag ${isFree ? 'tag-free' : 'tag-paid'}">${isFree ? '✅ Gratis' : '🔒 Premium'}</span>
+    <h4>${p.name}</h4>
+    <p>${p.desc}</p>
+    <div class="prod-stock">📄 ${p.pages} páginas</div>
+    <div class="prod-price" style="color:${isFree ? 'var(--red)' : 'var(--red2)'}">${p.price}</div>
+    ${isFree
+      ? `<button class="btn btn-primary" onclick="showToast('✅ Descarga iniciada: ${p.name}')">⬇ Descargar</button>`
+      : `<button class="btn btn-outline" style="color:var(--red2);border-color:rgba(224,32,32,.3)" onclick="openPay('${p.name}','${p.price}')">🔒 Adquirir</button>`}
+  </div>`;
+});
+
+function openPay(name, price) {
+  document.getElementById('payDesc').textContent = `${name} — ${price}`;
+  document.getElementById('payLink').href = `mailto:tuespacioforense@gmail.com?subject=Compra PDF: ${encodeURIComponent(name)}&body=Hola, quiero adquirir: ${encodeURIComponent(name)} (${encodeURIComponent(price)}). Por favor indíquenme cómo proceder.`;
+  openModal('payModal');
+}
+
+// Re-observe fades after tabs
+setTimeout(() => document.querySelectorAll('.fade-up').forEach(el => {
+  if (window._fadeObs) window._fadeObs.observe(el);
+}), 200);
+</script>
+</body>
+</html>
