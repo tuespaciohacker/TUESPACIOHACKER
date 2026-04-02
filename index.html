@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Tu Espacio Hacker | Ciberseguridad Profesional</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+/* FORCE DARK — always, everywhere */
+html,body{
+  background:#050505 !important;
+  color:#e8d0d0 !important;
+  font-family:'Rajdhani',sans-serif;
+  font-size:16px; line-height:1.7;
+  overflow-x:hidden;
+  min-height:100vh;
+}
+
+:root{
+  --bg:#050505;
+  --bg1:#080808;
+  --bg2:#0d0d0d;
+  --bg3:#111111;
+  --card:#0f0f0f;
+  --card2:#141414;
+  --red:#e02020;
+  --red2:#ff3535;
+  --red3:#b01818;
+  --red-g:rgba(224,32,32,.22);
+  --red-d:rgba(224,32,32,.08);
+  --red-m:rgba(224,32,32,.14);
+  --text:#e8d0d0;
+  --text2:#7a5555;
+  --text3:#3d2020;
+  --bdr:rgba(224,32,32,.14);
+  --bdr2:rgba(224,32,32,.42);
+  --mono:'Share Tech Mono',monospace;
+  --orb:'Orbitron',sans-serif;
+  --raj:'Rajdhani',sans-serif;
+}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#080808}
+::-webkit-scrollbar-thumb{background:#b01818;border-radius:2px}
+a{color:inherit;text-decoration:none}
+
+/* CIRCUIT GRID */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(224,32,32,.055) 60px),
+    repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(224,32,32,.055) 60px);
+  background-size:60px 60px;
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(224,32,32,.12) 1.5px,transparent 1.5px);
+  background-size:60px 60px;
+}
+
+/* SCANLINES */
+#scan{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.06) 3px,rgba(0,0,0,.06) 4px)}
+
+/* CANVAS */
+#cvs{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.03;pointer-events:none}
+
+/* ── CHROME TEXT ── */
+.cr{background:linear-gradient(180deg,#ff9090 0%,#e53030 22%,#7a0a0a 50%,#e53030 72%,#ff8080 88%,#c02020 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 18px rgba(229,48,48,.65))}
+.cw{background:linear-gradient(180deg,#fff 0%,#d8c8c8 28%,#885858 52%,#d8c8c8 74%,#fff 90%,#a07070 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* ── NAV ── */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  background:rgba(5,5,5,.94);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--bdr);transition:.3s;
+}
+.nw{max-width:1340px;margin:0 auto;padding:0 2rem;height:66px;
+  display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;
+  font-family:var(--orb);font-size:.95rem;letter-spacing:2px;color:var(--text)}
+.logo-hex{
+  width:36px;height:36px;
+  clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  background:var(--red-d);border:1.5px solid var(--red);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:.6rem;color:var(--red2);
+  box-shadow:0 0 12px var(--red-g)}
+.nl{display:flex;align-items:center;gap:2px;list-style:none}
+.nl a{font-family:var(--orb);font-size:.6rem;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--text2);padding:.42rem .85rem;border-radius:4px;transition:.2s}
+.nl a:hover,.nl a.on{color:var(--red2);background:var(--red-d);text-shadow:0 0 10px rgba(224,32,32,.5)}
+.nl .nb{color:var(--red2)!important;border:1px solid var(--bdr2);background:var(--red-d)!important;margin-left:.5rem}
+.ham{display:none;background:none;border:none;color:var(--red2);font-size:1.5rem;cursor:pointer}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;padding:7rem 2rem 4rem;
+  position:relative;z-index:1;overflow:hidden;
+  background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(224,32,32,.07) 0%,transparent 65%);
+}
+.hero>*{position:relative;z-index:2}
+
+/* SHIELD */
+.shield{position:relative;width:210px;height:210px;margin:0 auto 2.5rem;
+  animation:floaty 4s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(224,32,32,.2)}
+.r1{inset:-30px;animation:spin 12s linear infinite}
+.r2{inset:-55px;border-color:rgba(224,32,32,.1);animation:spin 20s linear infinite reverse}
+.r1::before,.r2::before{
+  content:'';position:absolute;top:-3.5px;left:50%;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--red2);box-shadow:0 0 10px var(--red2),0 0 20px rgba(224,32,32,.6);
+  transform:translateX(-50%)}
+.r2::before{top:auto;bottom:-3.5px;background:rgba(224,32,32,.6);box-shadow:0 0 6px var(--red);width:5px;height:5px}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.shield-svg{width:100%;height:100%;
+  filter:drop-shadow(0 0 28px rgba(224,32,32,.7)) drop-shadow(0 0 55px rgba(224,32,32,.35))}
+
+/* circuit sparks */
+.spark{
+  position:absolute;top:50%;left:50%;height:1px;
+  background:linear-gradient(90deg,rgba(224,32,32,.6),rgba(224,32,32,.15),transparent);
+  transform-origin:0 50%;animation:sparkle 3s ease-in-out infinite}
+@keyframes sparkle{0%,100%{opacity:.3}50%{opacity:.9}}
+
+.hero-tag{font-family:var(--mono);font-size:.7rem;color:var(--red2);
+  letter-spacing:4px;text-transform:uppercase;margin-bottom:1rem;opacity:.8}
+.hero-h1{font-family:var(--orb);font-size:clamp(2rem,6vw,5rem);
+  letter-spacing:4px;line-height:1.1;text-transform:uppercase;margin-bottom:.6rem}
+.hero-sub{font-family:var(--orb);font-size:clamp(.9rem,2vw,1.3rem);
+  letter-spacing:5px;text-transform:uppercase;color:var(--text2);margin-bottom:1.2rem}
+.hero-p{font-size:.95rem;color:var(--text2);max-width:500px;margin:0 auto 2.5rem;line-height:1.7}
+.btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:4.5rem}
+
+.btn-r{
+  background:var(--red);color:#fff;border:none;cursor:pointer;
+  font-family:var(--orb);font-weight:700;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;
+  padding:.85rem 1.8rem;border-radius:4px;transition:.25s;display:inline-block;
+  box-shadow:0 0 24px rgba(224,32,32,.45),inset 0 1px 0 rgba(255,100,100,.2)}
+.btn-r:hover{background:var(--red2);box-shadow:0 0 45px rgba(224,32,32,.7);transform:translateY(-2px)}
+.btn-o{
+  background:transparent;color:var(--text);border:1px solid rgba(224,32,32,.4);cursor:pointer;
+  font-family:var(--orb);font-weight:700;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;
+  padding:.85rem 1.8rem;border-radius:4px;transition:.25s;display:inline-block}
+.btn-o:hover{background:var(--red-d);border-color:var(--red);color:var(--red2);
+  box-shadow:0 0 22px rgba(224,32,32,.25);transform:translateY(-2px)}
+
+.stats{
+  display:flex;align-items:center;gap:2.5rem;flex-wrap:wrap;justify-content:center;
+  border-top:1px solid var(--bdr);padding-top:2rem;width:100%;max-width:680px}
+.sn{display:block;font-family:var(--orb);font-size:2rem;letter-spacing:2px;
+  color:var(--red2);line-height:1;text-shadow:0 0 18px rgba(224,32,32,.5)}
+.sl{font-family:var(--mono);font-size:.6rem;color:var(--text3);letter-spacing:2px;text-transform:uppercase}
+.sep{width:1px;height:40px;background:var(--bdr)}
+
+/* ── SECTION BASE ── */
+.sec{padding:6rem 2rem;position:relative;z-index:1}
+.sec-alt{background:rgba(224,32,32,.025)}
+.wrap{max-width:1340px;margin:0 auto}
+.sh{margin-bottom:3.5rem}
+.sh.c{text-align:center}.sh.c .sp{margin:0 auto}
+.stag{font-family:var(--mono);font-size:.68rem;color:var(--red2);
+  letter-spacing:3px;text-transform:uppercase;display:block;margin-bottom:.8rem;opacity:.75}
+.sh h2{font-family:var(--orb);font-size:clamp(1.5rem,3.5vw,2.6rem);
+  letter-spacing:3px;line-height:1.1;margin-bottom:.8rem}
+.sp{color:var(--text2);font-size:.92rem;max-width:560px}
+
+/* ── CARDS ── */
+.card{
+  background:var(--card);border:1px solid var(--bdr);
+  border-radius:5px;padding:2rem;transition:.3s;
+  position:relative;overflow:hidden}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);
+  transform:scaleX(0);transition:.35s}
+.card:hover{border-color:var(--bdr2);transform:translateY(-5px);
+  box-shadow:0 20px 60px rgba(224,32,32,.1);background:var(--card2)}
+.card:hover::before{transform:scaleX(1)}
+
+/* ── EXPERTISE GRID ── */
+.eg{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.3rem}
+.ec{background:var(--card);border:1px solid var(--bdr);border-radius:5px;
+  padding:2rem;transition:.3s;position:relative;overflow:hidden;text-align:center}
+.ec::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);
+  transform:scaleX(0);transition:.35s}
+.ec:hover{border-color:var(--bdr2);transform:translateY(-5px);
+  box-shadow:0 20px 60px rgba(224,32,32,.1);background:var(--card2)}
+.ec:hover::before{transform:scaleX(1)}
+.eico{width:54px;height:54px;margin:0 auto 1.2rem;
+  background:var(--red-d);border:1px solid var(--bdr);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;transition:.3s}
+.ec:hover .eico{box-shadow:0 0 20px rgba(224,32,32,.35);border-color:rgba(224,32,32,.45)}
+.ec h3{font-family:var(--orb);font-size:.82rem;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:.5rem}
+.ec p{font-size:.86rem;color:var(--text2);line-height:1.65}
+
+/* ── SERVICES PREVIEW ── */
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.2rem}
+.sc{background:var(--card);border:1px solid var(--bdr);border-radius:5px;
+  padding:1.8rem;transition:.3s;display:flex;flex-direction:column}
+.sc:hover{border-color:var(--bdr2);transform:translateY(-4px);
+  box-shadow:0 16px 50px rgba(224,32,32,.09)}
+.si{font-size:1.7rem;margin-bottom:1rem}
+.sc h3{font-family:var(--orb);font-size:.82rem;letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:.5rem}
+.sc p{font-size:.86rem;color:var(--text2);flex:1;margin-bottom:1.2rem;line-height:1.6}
+.sl2{color:var(--red2);font-family:var(--orb);font-weight:700;font-size:.68rem;
+  letter-spacing:1px;text-transform:uppercase;transition:.2s}
+.sl2:hover{letter-spacing:3px;text-shadow:0 0 8px rgba(224,32,32,.45)}
+
+/* ── CTA BAND ── */
+.cta{
+  background:linear-gradient(135deg,#180808,rgba(20,5,5,.8));
+  border-top:1px solid var(--bdr);border-bottom:1px solid var(--bdr);
+  padding:5rem 2rem;text-align:center;position:relative;z-index:1;overflow:hidden}
+.cta::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:500px;height:280px;
+  background:radial-gradient(ellipse,rgba(224,32,32,.1) 0%,transparent 70%);pointer-events:none}
+.cta h2{font-family:var(--orb);font-size:clamp(1.5rem,4vw,2.8rem);
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:1rem}
+.cta p{color:var(--text2);max-width:480px;margin:0 auto 2rem;font-size:.95rem}
+
+/* ── PAGE HERO (inner pages) ── */
+.ph{min-height:40vh;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:9rem 2rem 4rem;position:relative;z-index:1;
+  background:radial-gradient(ellipse 70% 55% at 50% 0%,rgba(224,32,32,.09) 0%,transparent 65%)}
+.ph::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:.4}
+.ph-tag{font-family:var(--mono);font-size:.7rem;color:var(--red2);
+  letter-spacing:3px;text-transform:uppercase;display:block;margin-bottom:.8rem;opacity:.8}
+.ph h1{font-family:var(--orb);font-size:clamp(2.5rem,7vw,5rem);
+  letter-spacing:4px;line-height:1.05;margin-bottom:1rem}
+
+/* ── FOOTER ── */
+footer{background:var(--bg1);border-top:1px solid var(--bdr);
+  padding:4.5rem 2rem 2rem;position:relative;z-index:1}
+footer::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:.5}
+.fg{max-width:1340px;margin:0 auto 3rem;
+  display:grid;grid-template-columns:2fr 1fr 1fr 2fr;gap:2.5rem}
+.fc h4{font-family:var(--orb);font-size:.62rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:2px;color:var(--red2);margin-bottom:1.1rem}
+.fc ul{list-style:none}
+.fc ul li{margin-bottom:.55rem}
+.fc ul li a{font-size:.88rem;color:var(--text2);transition:.2s}
+.fc ul li a:hover{color:var(--red2)}
+.fb{max-width:1340px;margin:0 auto;padding-top:1.8rem;border-top:1px solid var(--bdr);
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.8rem}
+.fb span{font-family:var(--mono);font-size:.7rem;color:var(--text3)}
+.fb .ft{color:var(--red2);opacity:.4}
+footer p.fd{font-size:.84rem;color:var(--text2);line-height:1.75;max-width:280px;margin-top:1rem}
+.fmail{font-size:.88rem;color:var(--text2);display:block;margin-bottom:1.1rem}
+.fmail:hover{color:var(--red2)}
+.fleg{font-size:.74rem;color:var(--text3);line-height:1.65;
+  background:var(--red-d);border:1px solid var(--bdr);border-radius:4px;padding:.75rem 1rem}
+
+/* ── FADE UP ── */
+.fu{opacity:0;transform:translateY(26px);transition:opacity .55s ease,transform .55s ease}
+.fu.vis{opacity:1;transform:translateY(0)}
+.fu:nth-child(2){transition-delay:.1s}.fu:nth-child(3){transition-delay:.2s}
+.fu:nth-child(4){transition-delay:.3s}.fu:nth-child(5){transition-delay:.4s}
+.fu:nth-child(6){transition-delay:.5s}
+
+/* ── ANIMATIONS ── */
+@keyframes pulse-r{0%,100%{box-shadow:0 0 20px rgba(224,32,32,.3)}50%{box-shadow:0 0 40px rgba(224,32,32,.65)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1060px){
+  .nl{display:none}.ham{display:block}
+  .fg{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){
+  .sec{padding:4rem 1.25rem}
+  .fg{grid-template-columns:1fr}
+  .fb{flex-direction:column;text-align:center}}
+</style>
+</head>
+<body>
+
+<div id="scan"></div>
+<canvas id="cvs"></canvas>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nw">
+    <a href="index.html" class="logo">
+      <div class="logo-hex">TEH</div>
+      TU&nbsp;ESPACIO&nbsp;<span class="cr" style="font-family:'Orbitron',sans-serif;letter-spacing:3px;margin-left:4px">HACKER</span>
+    </a>
+    <ul class="nl">
+      <li><a href="index.html" class="on">Inicio</a></li>
+      <li><a href="servicios.html">Servicios</a></li>
+      <li><a href="catalogo.html">Catálogo</a></li>
+      <li><a href="recursos.html">PDFs</a></li>
+      <li><a href="blog.html">Blog</a></li>
+      <li><a href="contacto.html">Contacto</a></li>
+      <li><a href="admin.html" class="nb">⚙ Admin</a></li>
+    </ul>
+    <button class="ham" onclick="document.getElementById('mmenu').style.right='0'">☰</button>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div id="mmenu" style="position:fixed;top:0;right:-280px;width:260px;height:100vh;background:#0d0d0d;border-left:1px solid rgba(224,32,32,.14);z-index:900;padding:5rem 2rem;transition:right .3s ease">
+  <button onclick="document.getElementById('mmenu').style.right='-280px'" style="position:absolute;top:1.2rem;right:1.2rem;background:none;border:none;color:#ff3535;font-size:1.2rem;cursor:pointer">✕</button>
+  <ul style="list-style:none">
+    <li style="margin-bottom:1.2rem"><a href="index.html" style="font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#e8d0d0">Inicio</a></li>
+    <li style="margin-bottom:1.2rem"><a href="servicios.html" style="font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#e8d0d0">Servicios</a></li>
+    <li style="margin-bottom:1.2rem"><a href="catalogo.html" style="font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#e8d0d0">Catálogo</a></li>
+    <li style="margin-bottom:1.2rem"><a href="recursos.html" style="font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#e8d0d0">PDFs</a></li>
+    <li style="margin-bottom:1.2rem"><a href="blog.html" style="font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#e8d0d0">Blog</a></li>
+    <li style="margin-bottom:1.2rem"><a href="contacto.html" style="font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#e8d0d0">Contacto</a></li>
+  </ul>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <!-- SPARKS -->
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:100%;height:100%;pointer-events:none;z-index:1">
+    <div class="spark" style="width:180px;transform:translateX(110px) rotate(0deg)"></div>
+    <div class="spark" style="width:130px;margin-top:-55px;transform:translateX(110px) rotate(-22deg);animation-delay:.5s"></div>
+    <div class="spark" style="width:110px;margin-top:55px;transform:translateX(110px) rotate(22deg);animation-delay:1s"></div>
+    <div class="spark" style="width:180px;transform:translateX(-110px) rotate(180deg)"></div>
+    <div class="spark" style="width:130px;margin-top:-55px;transform:translateX(-110px) rotate(202deg);animation-delay:.8s"></div>
+    <div class="spark" style="width:110px;margin-top:55px;transform:translateX(-110px) rotate(158deg);animation-delay:1.5s"></div>
+  </div>
+
+  <!-- SHIELD SVG -->
+  <div class="shield">
+    <div class="ring r2"></div>
+    <div class="ring r1"></div>
+    <svg class="shield-svg" viewBox="0 0 200 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="sg" cx="50%" cy="40%" r="50%">
+          <stop offset="0%" stop-color="#e02020" stop-opacity=".18"/>
+          <stop offset="100%" stop-color="#e02020" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <!-- outer shield -->
+      <path d="M100 12 L178 46 L178 112 C178 156 144 191 100 210 C56 191 22 156 22 112 L22 46 Z" fill="url(#sg)" stroke="#e02020" stroke-width="1.5"/>
+      <!-- inner shield -->
+      <path d="M100 30 L162 58 L162 113 C162 148 134 177 100 193 C66 177 38 148 38 113 L38 58 Z" fill="rgba(224,32,32,.04)" stroke="rgba(224,32,32,.35)" stroke-width="1"/>
+      <!-- hex center -->
+      <polygon points="100,74 121,85 121,107 100,118 79,107 79,85" fill="rgba(224,32,32,.18)" stroke="#e02020" stroke-width="1.5"/>
+      <!-- lock body -->
+      <rect x="87" y="93" width="26" height="19" rx="2" fill="rgba(224,32,32,.3)" stroke="#e02020" stroke-width="1.2"/>
+      <!-- lock arch -->
+      <path d="M93 93 L93 87 C93 80.5 107 80.5 107 87 L107 93" fill="none" stroke="#e02020" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- keyhole -->
+      <circle cx="100" cy="102" r="3.5" fill="#e02020"/>
+      <rect x="98.5" y="102" width="3" height="5" rx="1" fill="#e02020"/>
+      <!-- corner nodes -->
+      <circle cx="22" cy="46" r="3.5" fill="#ff3535" opacity=".7"/>
+      <circle cx="178" cy="46" r="3.5" fill="#ff3535" opacity=".7"/>
+      <circle cx="100" cy="12" r="3.5" fill="#ff3535"/>
+      <!-- edge glow dots -->
+      <circle cx="152" cy="68" r="2" fill="#ff4040" opacity=".5"/>
+      <circle cx="157" cy="128" r="2" fill="#ff4040" opacity=".5"/>
+      <circle cx="48" cy="68" r="2" fill="#ff4040" opacity=".5"/>
+      <circle cx="43" cy="128" r="2" fill="#ff4040" opacity=".5"/>
+      <circle cx="100" cy="208" r="2.5" fill="#ff3535" opacity=".6"/>
+      <!-- circuit lines on shield -->
+      <line x1="100" y1="12" x2="100" y2="30" stroke="rgba(224,32,32,.4)" stroke-width="1"/>
+      <line x1="22" y1="46" x2="38" y2="58" stroke="rgba(224,32,32,.4)" stroke-width="1"/>
+      <line x1="178" y1="46" x2="162" y2="58" stroke="rgba(224,32,32,.4)" stroke-width="1"/>
+    </svg>
+  </div>
+
+  <p class="hero-tag">// SISTEMA DE SEGURIDAD ACTIVO — MODO ÉTICO HABILITADO</p>
+
+  <h1 class="hero-h1">
+    <span class="cw">ASEGURANDO TU</span><br>
+    <span class="cr">FRONTERA DIGITAL</span>
+  </h1>
+
+  <p class="hero-sub">TU ESPACIO HACKER</p>
+
+  <p class="hero-p">
+    Soluciones avanzadas de Ethical Hacking y Pentesting profesional.<br>
+    Defiende tu organización contra amenazas cibernéticas en evolución.
+  </p>
+
+  <div class="btns">
+    <a href="servicios.html" class="btn-r">[OBTENER PROTECCIÓN]</a>
+    <a href="recursos.html" class="btn-o">[APRENDER MÁS]</a>
+  </div>
+
+  <div class="stats">
+    <div><span class="sn">500+</span><span class="sl">Clientes</span></div>
+    <div class="sep"></div>
+    <div><span class="sn">200+</span><span class="sl">Recursos PDF</span></div>
+    <div class="sep"></div>
+    <div><span class="sn">50+</span><span class="sl">Herramientas</span></div>
+    <div class="sep"></div>
+    <div><span class="sn">24/7</span><span class="sl">Soporte</span></div>
+  </div>
+</section>
+
+<!-- EXPERTISE -->
+<section class="sec sec-alt">
+  <div class="wrap">
+    <div class="sh c fu">
+      <span class="stag">// NUESTRA EXPERIENCIA</span>
+      <h2><span class="cw">NUESTRA</span> <span class="cr">EXPERIENCIA</span></h2>
+    </div>
+    <div class="eg">
+      <div class="ec fu"><div class="eico">🛡️</div>
+        <h3>[<span class="cr">Penetration</span> Testing]</h3>
+        <p>Simulación de ataques reales sobre tu infraestructura con autorización previa. Metodología PTES y OWASP.</p>
+      </div>
+      <div class="ec fu"><div class="eico">🔍</div>
+        <h3>[<span class="cr">Vulnerability</span> Assessment]</h3>
+        <p>Escaneo y evaluación de vulnerabilidades en sistemas, redes y aplicaciones web con reporte detallado.</p>
+      </div>
+      <div class="ec fu"><div class="eico">🚨</div>
+        <h3>[<span class="cr">Incident</span> Response]</h3>
+        <p>Respuesta a incidentes y análisis forense digital. Primera respuesta ante brechas de seguridad.</p>
+      </div>
+      <div class="ec fu"><div class="eico">🔐</div>
+        <h3>[<span class="cr">Security</span> Consulting]</h3>
+        <p>Asesoría estratégica para implementar políticas de seguridad sólidas en tu organización.</p>
+      </div>
+      <div class="ec fu"><div class="eico">🕵️</div>
+        <h3>[<span class="cr">OSINT</span> Intelligence]</h3>
+        <p>Recopilación de inteligencia de fuentes abiertas para investigaciones y análisis de exposición.</p>
+      </div>
+      <div class="ec fu"><div class="eico">🎓</div>
+        <h3>[<span class="cr">Security</span> Training]</h3>
+        <p>Capacitación práctica en ethical hacking y ciberseguridad para equipos de TI y particulares.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES PREVIEW -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sh fu">
+      <span class="stag">// SERVICIOS</span>
+      <h2><span class="cr">SOLUCIONES</span> <span class="cw">PROFESIONALES</span></h2>
+      <p class="sp">Defensa y auditoría de sistemas con metodologías certificadas y personal especializado.</p>
+    </div>
+    <div class="sg">
+      <div class="sc fu"><div class="si">🔐</div>
+        <h3>Auditoría de <span class="cr">Seguridad</span></h3>
+        <p>Evaluación completa de vulnerabilidades. Reporte ejecutivo con plan de remediación priorizado.</p>
+        <a href="servicios.html" class="sl2">[ VER SERVICIO → ]</a>
+      </div>
+      <div class="sc fu"><div class="si">📱</div>
+        <h3>Forense <span class="cr">Digital</span></h3>
+        <p>Recuperación y análisis de evidencia digital con validez legal. Peritaje informático oficial.</p>
+        <a href="servicios.html" class="sl2">[ VER SERVICIO → ]</a>
+      </div>
+      <div class="sc fu"><div class="si">🌐</div>
+        <h3>Pentesting <span class="cr">Web & Redes</span></h3>
+        <p>Pruebas de intrusión controladas bajo contrato. Cobertura OWASP Top 10 completa.</p>
+        <a href="servicios.html" class="sl2">[ VER SERVICIO → ]</a>
+      </div>
+      <div class="sc fu"><div class="si">🔍</div>
+        <h3>OSINT & <span class="cr">Inteligencia</span></h3>
+        <p>Análisis de exposición digital, monitoreo de marca y recopilación de inteligencia profesional.</p>
+        <a href="servicios.html" class="sl2">[ VER SERVICIO → ]</a>
+      </div>
+      <div class="sc fu"><div class="si">🎓</div>
+        <h3>Cursos & <span class="cr">Capacitación</span></h3>
+        <p>Formación práctica en ethical hacking y herramientas de ciberseguridad. Online y presencial.</p>
+        <a href="servicios.html" class="sl2">[ VER SERVICIO → ]</a>
+      </div>
+      <div class="sc fu"><div class="si">🛡️</div>
+        <h3>Consultoría <span class="cr">Estratégica</span></h3>
+        <p>Diseño de políticas de seguridad, análisis de riesgos y cumplimiento normativo LFPDPPP.</p>
+        <a href="servicios.html" class="sl2">[ VER SERVICIO → ]</a>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:2.5rem">
+      <a href="servicios.html" class="btn-o fu">[ VER TODOS LOS SERVICIOS ]</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta">
+  <h2 class="fu"><span class="cw">¿LISTO PARA</span> <span class="cr">PROTEGERTE?</span></h2>
+  <p class="fu">Contáctanos hoy y recibe una evaluación inicial sin costo. Tu seguridad digital es nuestra misión.</p>
+  <a href="contacto.html" class="btn-r fu">[CONTACTAR AHORA]</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="fg">
+    <div>
+      <a href="index.html" class="logo" style="display:inline-flex;margin-bottom:1rem">
+        <div class="logo-hex">TEH</div>
+        TU&nbsp;ESPACIO&nbsp;<span class="cr" style="font-family:'Orbitron',sans-serif;letter-spacing:3px;margin-left:4px">HACKER</span>
+      </a>
+      <p class="fd">Ciberseguridad profesional y ethical hacking. Servicios bajo consentimiento explícito y marco legal vigente en México.</p>
+    </div>
+    <div class="fc">
+      <h4>Navegación</h4>
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="servicios.html">Servicios</a></li>
+        <li><a href="catalogo.html">Catálogo</a></li>
+        <li><a href="recursos.html">PDFs</a></li>
+        <li><a href="blog.html">Blog</a></li>
+      </ul>
+    </div>
+    <div class="fc">
+      <h4>Servicios</h4>
+      <ul>
+        <li><a href="servicios.html">Auditoría</a></li>
+        <li><a href="servicios.html">Forense Digital</a></li>
+        <li><a href="servicios.html">Pentesting</a></li>
+        <li><a href="servicios.html">Capacitación</a></li>
+        <li><a href="servicios.html">OSINT</a></li>
+      </ul>
+    </div>
+    <div class="fc">
+      <h4>Contacto</h4>
+      <a href="mailto:tuespacioforense@gmail.com" class="fmail">tuespacioforense@gmail.com</a>
+      <div class="fleg">⚖️ Todos los servicios se realizan con autorización escrita previa. El acceso no autorizado a sistemas ajenos es delito federal en México.</div>
+    </div>
+  </div>
+  <div class="fb">
+    <span>© 2025 Tu Espacio Hacker. Todos los derechos reservados.</span>
+    <span class="ft">// CIBERSEGURIDAD ÉTICA &amp; PROFESIONAL</span>
+  </div>
+</footer>
+
+<script>
+/* MATRIX RED */
+(function(){
+  const c=document.getElementById('cvs');
+  const x=c.getContext('2d');
+  const ch='01アイウエオカキクケコサシスセソタチツテト';
+  let W,H,cols,drops;
+  function init(){W=c.width=innerWidth;H=c.height=innerHeight;cols=Math.floor(W/18);drops=Array(cols).fill(1);}
+  function draw(){
+    x.fillStyle='rgba(5,5,5,.07)';x.fillRect(0,0,W,H);
+    x.fillStyle='#e02020';x.font='13px Share Tech Mono';
+    drops.forEach((y,i)=>{x.fillText(ch[Math.floor(Math.random()*ch.length)],i*18,y*18);
+      if(y*18>H&&Math.random()>.975)drops[i]=0;drops[i]++;});
+  }
+  init();window.addEventListener('resize',init);setInterval(draw,60);
+})();
+
+/* NAV SCROLL */
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').style.background=
+    scrollY>60?'rgba(5,5,5,.98)':'rgba(5,5,5,.94)';
+});
+
+/* FADE-IN OBSERVER */
+const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');}),{threshold:.08});
+document.querySelectorAll('.fu').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>
